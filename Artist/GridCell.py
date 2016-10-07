@@ -6,11 +6,17 @@ class GridCell(object):
     x = attr.ib()
     y = attr.ib()
     adj = []
+    currentX = -1
+    currentY = -1
 
     @property
     def siblings(self):
-        if self.adj:
+        if self.adj and self.x == currentX and self.y == currentY:
             return self.adj
+
+        self.adj = []
+        currentX = self.x
+        currentY = self.y
 
         for i in range(-1, 2):
             for j in range(-1, 2):

@@ -16,10 +16,19 @@ class God(object):
 
     def judgeLifeform(self, lifeFormArray):
         lifeFormGrid = self.grids.arrayToGrid(lifeFormArray, self.lifeFormWidth)
-        # for y in range(0, len(self.lifeFormHeight)):
-        #     for x in range(0, len(self.lifeFormWidth)):
-        cell = self.grids.getCellAtIndex(lifeFormGrid, 0, 0)
-        return cell.adjacentSiblingsCount
+        score = 0
+
+        for y in range(0, self.lifeFormHeight):
+            for x in range(0, self.lifeFormWidth):
+                cell = self.grids.getCellAtIndex(lifeFormGrid, x, y)
+                score += self.scoreCell_(cell)
+
+        return score
+
+    def scoreCell_(self, cell):
+        # if cell.target == 0:
+        #     return 0
+        return cell.target
 
 
     def createLife(self):
