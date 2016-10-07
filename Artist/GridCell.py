@@ -11,13 +11,16 @@ class GridCell(object):
 
     @property
     def siblings(self):
-        if self.adj and self.x == currentX and self.y == currentY:
+        # Caching is still on previous cell
+        if self.adj and self.x == self.currentX and self.y == self.currentY:
             return self.adj
 
+        # Clears cache
         self.adj = []
-        currentX = self.x
-        currentY = self.y
+        self.currentX = self.x
+        self.currentY = self.y
 
+        # calculates siblings for cell
         for i in range(-1, 2):
             for j in range(-1, 2):
                 yIndex = self.y+i
@@ -42,7 +45,7 @@ class GridCell(object):
     @property
     def adjacentSiblingsCount(self):
         adjacents = [self.n, self.w, self.e, self.s]
-        return 4 - adjacents.count(-1)
+        return 4 - adjacents.count(-1) - adjacents.count(0)
 
     @property
     def nw(self):
