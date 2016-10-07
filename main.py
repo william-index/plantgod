@@ -6,7 +6,9 @@ god = God(4)
 
 # generate initial population
 initialPop = god.createLife()
-print initialPop
+
+lf0Score = god.judgeLifeform(initialPop[0])
+print lf0Score
 
 # ||: for N cycles or to stop criteria
     # determine success for all members
