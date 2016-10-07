@@ -10,6 +10,65 @@ class God(object):
     lifeFormHeight = 32
 
 
+    """
+    Picks the most fit members from a group.
+
+    Args:
+        lifeforms (Array) : array of lifeform DNAs
+        survivorCount (int) : number to pick
+    Returns:
+        Array: Array of lifeform arrays
+    """
+    def pickMostFit(self, lifeforms, survivorCount):
+        lifeforms.sort(self.lifeFormSort)
+
+        return lifeforms[0:survivorCount]
+
+    # Sort method for determining which members are most fit
+    def lifeFormSort(self, a, b):
+        aScore = self.judgeLifeform(a)
+        bScore = self.judgeLifeform(b)
+
+        if aScore < bScore:
+            return 1
+        elif aScore == bScore:
+            return 0
+        else:
+            return -1
+
+    """
+    Crossbreeds lifeforms from a a given set of lifeforms.
+
+    Args:
+        lifeforms (Array) : array of lifeform DNAs
+    Returns:
+        Array: Array of lifeform arrays
+    """
+    def breed(self, lifeforms):
+        print "TODO: Code breeding for generations"
+        return lifeforms
+
+
+    """
+    Performs random mutations on random lifeforms in a set of random lifeforms.
+
+    Args:
+        lifeforms (Array) : array of lifeform DNAs
+    Returns:
+        Array: Array of lifeform arrays
+    """
+    def mutate(self, lifeforms):
+        print "TODO: Code in Mutations"
+        return lifeforms
+
+    """
+    Calculates the score for a lifeform.
+
+    Args:
+        lifeFormArray (Array) : lifeform DNA
+    Returns:
+        int: score for how successful a lifeform is
+    """
     def judgeLifeform(self, lifeFormArray):
         lifeFormGrid = self.grids.arrayToGrid(lifeFormArray, self.lifeFormWidth)
 
@@ -31,8 +90,8 @@ class God(object):
                 nutrientsProduced += self.getCellNutrientsProduced_(cell)
 
 
-        print ('energyNeeded', energyNeeded), ('energyProduced', energyProduced)
-        print ('nutrientsNeeded', nutrientsNeeded), ('nutrientsProduced', nutrientsProduced)
+        # print ('energyNeeded', energyNeeded), ('energyProduced', energyProduced)
+        # print ('nutrientsNeeded', nutrientsNeeded), ('nutrientsProduced', nutrientsProduced)
 
         energyOffset = abs(energyNeeded - energyProduced)
         nutrientOffset = abs(nutrientsNeeded - nutrientsProduced)
@@ -46,7 +105,7 @@ class God(object):
 
 
     """
-    Ccounts the number of living cells in a lifeform
+    Counts the number of living cells in a lifeform
 
     Args:
         lifeFormArray (Array) : lifeform DNA

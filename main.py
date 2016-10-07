@@ -2,18 +2,24 @@ from God import God
 from Settings import colors
 from PIL import Image, ImageDraw, ImageOps, ImageFont
 
-god = God(4)
+generations = 3
+initialPopSize = 10
+survivalSize = 4
+
+god = God(initialPopSize)
 
 # generate initial population
 initialPop = god.createLife()
 
-lf0Score = god.judgeLifeform(initialPop[0])
-print lf0Score
+parents = god.pickMostFit(initialPop, survivalSize)
+print "TODO: Save image starting generation"
 
-# ||: for N cycles or to stop criteria
-    # determine success for all members
-        # select N members from generation to pass along
+for i in range(0, generations):
+    offspring = god.breed(parents)
+    offspring = god.mutate(offspring)
+    parents = god.pickMostFit(offspring, survivalSize)
+    print "TODO: Save image for survivors"
 
-    # Cross Breed members
-    # Apply Mutations
-# :||
+finalForms = parents
+for p in finalForms:
+    print god.judgeLifeform(p)
