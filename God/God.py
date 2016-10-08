@@ -65,7 +65,7 @@ class God(object):
         for i in range(0, len(segmentedPlants)):
             parent1 = segmentedPlants[i]
 
-            for k in range(0, 3):
+            for k in range(0, 2):
                 parent2 = segmentedPlants[randint(0, len(segmentedPlants)-1)]#segmentedPlants[(i+1) % len(segmentedPlants)]
                 breeders = [parent1, parent2]
 
@@ -114,7 +114,7 @@ class God(object):
 
         for lifeform in lifeforms:
             numMutations = randint(0, 30)
-            if numMutations < 3:
+            if randint(0, 100) < 1:
                 print "RADICAL MUTATION!!!"
                 lifeform = self.createRandomLifeform((self.lifeFormWidth, self.lifeFormHeight))
             else:
@@ -184,7 +184,7 @@ class God(object):
         nutrientOffset = nutrientsProduced - nutrientsNeeded#abs(nutrientsNeeded - nutrientsProduced)
         score = 0
         # Offset of energy and nutrients
-        score =  energyOffset + (nutrientOffset * 2)
+        score =  energyOffset**2 + nutrientOffset**2
         # bonus for living cells
         score += self.countRealCells_(lifeFormGrid)
 
@@ -325,6 +325,7 @@ class God(object):
         energy -= cell.target/4
 
         # Energy is conserved by having similar pigment siblings
+        # @TODO: exclude target from sibling list..
         for sibling in cell.siblings:
             if cell.target == sibling:
                 energy -= 2
