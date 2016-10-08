@@ -1,5 +1,5 @@
 import attr
-from random import randint
+from random import randint, shuffle
 from Artist import GridSystem
 
 @attr.s
@@ -45,9 +45,51 @@ class God(object):
         Array: Array of lifeform arrays
     """
     def breed(self, lifeforms):
-        print "TODO: Code breeding for generations"
-        return lifeforms
+        print "Breeding..."
+        nextGen = []
 
+        segments = self.pickRandomDivisor_(len(lifeforms[0]))
+        print "DNA Splice length: ", segments
+
+        segmentedPlants = self.sliceToSegments_(lifeforms, segments)
+        print "Recombinating DNA..."
+
+        for i in range(0, len(segmentedPlants)):
+            parent1 = segmentedPlants[i]
+            parent2 = segmentedPlants[(i+1) % len(segmentedPlants)]
+
+            breeders = [parent1, parent2]
+
+            for k in range(0, 3):
+                newPlant = []
+
+                for j in range(0, len(segmentedPlants[i])):
+                    side = randint(0, 1)
+                    newPlant += breeders[side][j]
+
+                nextGen.append(newPlant)
+
+        return nextGen
+
+    def sliceToSegments_(self, lifeforms, segments):
+        segmentedPlants = []
+
+        for plant in lifeforms:
+            plantSegments = []
+            for i in range(0, len(plant), segments):
+                plantSegments.append(plant[i:i + segments])
+            segmentedPlants.append(plantSegments)
+
+        return segmentedPlants
+
+    def pickRandomDivisor_(self, length):
+        segments = 1
+        moduloRemainder = 1
+        while moduloRemainder != 0:
+            segments = randint(4, length/6)
+            moduloRemainder = length % segments
+
+        return segments
 
     """
     Performs random mutations on random lifeforms in a set of random lifeforms.
@@ -58,8 +100,18 @@ class God(object):
         Array: Array of lifeform arrays
     """
     def mutate(self, lifeforms):
-        print "TODO: Code in Mutations"
-        return lifeforms
+        print "Mutating offspring..."
+        mutateLifeforms = []
+
+        for lifeform in lifeforms:
+            numMutations = randint(0, 30)
+            for i in range(0, numMutations):
+                newVal = hex(randint(0, 15) )[2:]
+                lifeform[randint(0, len(lifeform))-1] = newVal
+
+            mutateLifeforms.append(lifeform)
+
+        return mutateLifeforms
 
     """
     Calculates the score for a lifeform.
