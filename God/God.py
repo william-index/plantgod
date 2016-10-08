@@ -188,7 +188,7 @@ class God(object):
         # bonus for living cells
         score += self.countRealCells_(lifeFormGrid)
 
-        return 'Score:', score
+        return score
 
 
     """
