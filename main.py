@@ -1,12 +1,25 @@
 from God import God
-from Settings import colors
-from PIL import Image, ImageDraw, ImageOps, ImageFont
+from Artist import PixelArtist
 
-generations = 30
-initialPopSize = 10
-survivalSize = 4
+# Default settings
+generations = 200
+initialPopSize = 20
+survivalSize = 8
+plantWidth = 16
+plantHeight = 32
+rootStart = 0.8
 
-god = God(initialPopSize)
+# Create the almighty creator
+print "Initializing God."
+god = God(
+            firstGenerationSize=initialPopSize,
+            lifeFormWidth = plantWidth,
+            lifeFormHeight = plantHeight,
+            rootStartPercent = rootStart
+         )
+
+# Initializes PixelArtist
+pixelArtist = PixelArtist()
 
 # generate initial population
 initialPop = god.createLife()
@@ -21,12 +34,12 @@ print "TODO: Save image starting generation"
 # With the point value of the plant underneath it
 
 for i in range(0, generations):
+    print "----------------------------------"
     print "Starting generation: ", i
     offspring = god.breed(parents)
     offspring = god.mutate(offspring)
+    offspring = god.trimDeadCells(offspring)
     parents = god.pickMostFit(offspring, survivalSize)
-    print "Completed generation: ", i
-
     print "TODO: Save image for survivors"
 
 print "Initial Scores:"
@@ -37,3 +50,5 @@ print "Final Scores:"
 finalForms = parents
 for p in finalForms:
     print god.judgeLifeform(p)
+
+pixelArtist.drawPlantGeneration(lifeforms=finalForms, filename='generation_final', columns=plantWidth)

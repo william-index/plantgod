@@ -4,10 +4,11 @@ from Artist import GridSystem
 
 @attr.s
 class God(object):
-    generationSize = attr.ib()
+    firstGenerationSize = attr.ib()
+    lifeFormWidth = attr.ib()
+    lifeFormHeight = attr.ib()
+    rootStartPercent = attr.ib()
     grids = GridSystem()
-    lifeFormWidth = 16
-    lifeFormHeight = 32
 
 
     """
@@ -20,9 +21,16 @@ class God(object):
         Array: Array of lifeform arrays
     """
     def pickMostFit(self, lifeforms, survivorCount):
+        print "Selecting most fit members.."
         lifeforms.sort(self.lifeFormSort)
 
-        return lifeforms[0:survivorCount]
+        # selects best for surviors
+        chosenLifeforms = lifeforms[0:survivorCount-1]
+
+        # selects a random survivor
+        chosenLifeforms.append(lifeforms[randint(0, len(lifeforms)-1)])
+
+        return chosenLifeforms
 
     # Sort method for determining which members are most fit
     def lifeFormSort(self, a, b):
@@ -56,11 +64,11 @@ class God(object):
 
         for i in range(0, len(segmentedPlants)):
             parent1 = segmentedPlants[i]
-            parent2 = segmentedPlants[(i+1) % len(segmentedPlants)]
-
-            breeders = [parent1, parent2]
 
             for k in range(0, 3):
+                parent2 = segmentedPlants[randint(0, len(segmentedPlants)-1)]#segmentedPlants[(i+1) % len(segmentedPlants)]
+                breeders = [parent1, parent2]
+
                 newPlant = []
 
                 for j in range(0, len(segmentedPlants[i])):
@@ -69,6 +77,7 @@ class God(object):
 
                 nextGen.append(newPlant)
 
+        print len(nextGen), " offspring produced."
         return nextGen
 
     def sliceToSegments_(self, lifeforms, segments):
@@ -105,13 +114,39 @@ class God(object):
 
         for lifeform in lifeforms:
             numMutations = randint(0, 30)
-            for i in range(0, numMutations):
-                newVal = hex(randint(0, 15) )[2:]
-                lifeform[randint(0, len(lifeform))-1] = newVal
+            if numMutations < 3:
+                print "RADICAL MUTATION!!!"
+                lifeform = self.createRandomLifeform((self.lifeFormWidth, self.lifeFormHeight))
+            else:
+                for i in range(0, numMutations):
+                    newVal = hex(randint(0, 15) )[2:]
+                    lifeform[randint(0, len(lifeform))-1] = newVal
 
             mutateLifeforms.append(lifeform)
 
         return mutateLifeforms
+
+    def trimDeadCells(self, lifeforms):
+        print "Trimming detached cells..."
+        trimmedLifeforms = []
+
+        for lifeform in lifeforms:
+            fixedLifeform = []
+            lifeFormGrid = self.grids.arrayToGrid(lifeform, self.lifeFormWidth)
+
+            # All energy is calculated by checking all cells
+            for y in range(0, self.lifeFormHeight):
+                for x in range(0, self.lifeFormWidth):
+                    cell = self.grids.getCellAtIndex(lifeFormGrid, x, y)
+                    if cell.siblingsCount <= 1 and cell.adjacentSiblingsCount == 0:
+                        lifeFormGrid[y][x] = '0'
+
+            for row in lifeFormGrid:
+                fixedLifeform += row
+
+            trimmedLifeforms.append(fixedLifeform)
+
+        return trimmedLifeforms
 
     """
     Calculates the score for a lifeform.
@@ -145,11 +180,11 @@ class God(object):
         # print ('energyNeeded', energyNeeded), ('energyProduced', energyProduced)
         # print ('nutrientsNeeded', nutrientsNeeded), ('nutrientsProduced', nutrientsProduced)
 
-        energyOffset = abs(energyNeeded - energyProduced)
-        nutrientOffset = abs(nutrientsNeeded - nutrientsProduced)
+        energyOffset = energyProduced - energyNeeded#abs(energyNeeded - energyProduced)
+        nutrientOffset = nutrientsProduced - nutrientsNeeded#abs(nutrientsNeeded - nutrientsProduced)
         score = 0
         # Offset of energy and nutrients
-        score =  (energyOffset + nutrientOffset) * -1
+        score =  energyOffset + (nutrientOffset * 2)
         # bonus for living cells
         score += self.countRealCells_(lifeFormGrid)
 
@@ -179,10 +214,10 @@ class God(object):
     def getCellNutrientsProduced_(self, cell):
         nutrients = 0
 
-        if cell.adjacentSiblingsCount == 0:
+        if cell.adjacentSiblingsCount == 0 or cell.siblingsCount > 4:
             return -1
 
-        if cell.y > self.lifeFormHeight * .8:
+        if cell.y > self.lifeFormHeight * self.rootStartPercent:
             nutrients += 1
             nutrients += cell.siblingsCount
             nutrients += cell.adjacentSiblingsCount*2
@@ -228,15 +263,16 @@ class God(object):
         energy = 0
 
         # Roots do not produce energy
-        if cell.y > self.lifeFormHeight * .8:
+        if cell.y > self.lifeFormHeight * self.rootStartPercent:
             return energy
 
         # Nonfilled cells are not part of plant
         if cell.target == 0:
             return energy
 
-        # High pigment cells produce more energy
-        energy += cell.target/4
+        # High pigment cells produce more energy when closer to sunlight
+        if cell.y < self.lifeFormHeight/4:
+            energy += cell.target/4
 
         # Cells closer to the "Sun" recieve more energy
         energy += self.lifeFormHeight - cell.y
@@ -268,17 +304,20 @@ class God(object):
             return energy
 
         # Major deficits for not being attached
-        if cell.siblingsCount == 0:
-            energy += 99
+        if cell.siblingsCount < 2:
+            energy += 30
         elif cell.adjacentSiblingsCount == 0:
-            energy += 10
+            energy += 20
 
         # Roots do not reqire energy
-        if cell.y > self.lifeFormHeight * .8:
+        if cell.y > self.lifeFormHeight * self.rootStartPercent:
             return energy
 
+        if cell.y > self.lifeFormHeight * (1.0 - self.rootStartPercent):
+            energy += cell.y
+
         # Requires one energy per sibling
-        energy += cell.siblingsCount
+        energy += cell.siblingsCount - cell.adjacentSiblingsCount
         # and additional energy if cell above is of a high value pigment
         energy += cell.n
 
@@ -300,7 +339,7 @@ class God(object):
     def createLife(self):
         lifeForms = []
 
-        for i in range(0, self.generationSize):
+        for i in range(0, self.firstGenerationSize):
             lifeForm = self.createRandomLifeform((self.lifeFormWidth, self.lifeFormHeight))
             lifeForms.append(lifeForm)
 
