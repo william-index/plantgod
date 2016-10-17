@@ -1,17 +1,21 @@
 from God import God
 from Artist import PixelArtist
 
-# @TODO: Try a lower resolution run
-# @TODO: only childen should be subject to mutation
+# Epics
+# @TODO: find a way to prevent reaching sub-optimal peaks
+
+# Tasks
+# @TODO: try cubing nutriets
+# @TODO: what if all the parents died each generatation
 # @TODO: Try asexual mutation where only one parent from a population produced
 #   offspring per tick, and then most fit from set pop size selected
 # @TODO: switch mutations to being only by a max increase or decrease of val 1
 # @TODO: roots should be most optimanl if they have exactly 2 siblings
-# @TODO: save out unique image every 100 generations
-# @TODO: give points for closely valued siblings
+# @TODO: give points for closely valued siblings (right now its exact)
+# @TODO: adjust criteria to prevent checkerboards
 
 # Default settings
-generations = 200
+generations = 20
 initialPopSize = 20
 survivalSize = 8
 plantWidth = 16
@@ -51,7 +55,7 @@ for i in range(0, generations):
     allLife = offspring + parents
     parents = god.pickMostFit(allLife, survivalSize)
     print "TODO: Save image for survivors"
-    if i % 10 == 0:
+    if i % 10 == 0 or i == generations - 1:
         pixelArtist.drawPlantGeneration(lifeforms=parents, filename='untouched_parents_squared_success_gen_{0}'.format(i), columns=plantWidth)
 
 print "Initial Scores:"
@@ -62,5 +66,3 @@ print "Final Scores:"
 finalForms = parents
 for p in finalForms:
     print god.judgeLifeform(p)
-
-pixelArtist.drawPlantGeneration(lifeforms=finalForms, filename='generations_2000_parent_and_child_any_mutation', columns=plantWidth)
