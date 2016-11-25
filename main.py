@@ -15,9 +15,9 @@ from Artist import PixelArtist
 # @TODO: adjust criteria to prevent checkerboards
 
 # Default settings
-generations = 20
+generations = 100
 initialPopSize = 50
-survivalSize = 10
+survivalSize = 8
 plantWidth = 16
 plantHeight = 32
 rootStart = 0.8
@@ -52,7 +52,7 @@ for i in range(0, generations):
     offspring = god.breed(parents)
     offspring = god.mutate(offspring)
     offspring = god.trimDeadCells(offspring)
-    allLife = offspring + parents
+    allLife = offspring + god.trimDeadCells(parents)
     parents = god.pickMostFit(allLife, survivalSize)
     print "TODO: Save image for survivors"
     if i % 10 == 0 or i == generations - 1:
