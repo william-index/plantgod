@@ -59,10 +59,12 @@ for i in range(0, generations):
         print "----------------------------------"
         pixelArtist.drawPlantGeneration(lifeforms=parents, filename='untouched_parents_squared_success_gen_{0}'.format(i), columns=plantWidth)
 
+print "----------------------------------"
 print "Initial Scores:"
 for p in parentGen:
     print god.judgeLifeform(p)
 
+print "----------------------------------"
 print "Final Scores:"
 finalForms = parents
 for p in finalForms:
