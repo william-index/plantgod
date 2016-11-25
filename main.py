@@ -3,12 +3,11 @@ from Artist import PixelArtist
 
 # Epics
 # @TODO: find a way to prevent reaching sub-optimal peaks
+#        currently there is a strong bias and we have a set direction
+#        at about generation 10...
 
 # Tasks
 # @TODO: try cubing nutriets
-# @TODO: what if all the parents died each generatation
-# @TODO: Try asexual mutation where only one parent from a population produced
-#   offspring per tick, and then most fit from set pop size selected
 # @TODO: switch mutations to being only by a max increase or decrease of val 1
 # @TODO: roots should be most optimanl if they have exactly 2 siblings
 # @TODO: give points for closely valued siblings (right now its exact)
@@ -51,11 +50,13 @@ for i in range(0, generations):
     print "Starting generation: ", i
     offspring = god.breed(parents)
     offspring = god.mutate(offspring)
+
+    print "Trimming detached cells..."
     offspring = god.trimDeadCells(offspring)
     allLife = offspring + god.trimDeadCells(parents)
     parents = god.pickMostFit(allLife, survivalSize)
-    print "TODO: Save image for survivors"
     if i % 10 == 0 or i == generations - 1:
+        print "----------------------------------"
         pixelArtist.drawPlantGeneration(lifeforms=parents, filename='untouched_parents_squared_success_gen_{0}'.format(i), columns=plantWidth)
 
 print "Initial Scores:"

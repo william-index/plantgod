@@ -129,7 +129,6 @@ class God(object):
         return mutateLifeforms
 
     def trimDeadCells(self, lifeforms):
-        print "Trimming detached cells..."
         trimmedLifeforms = []
 
         for lifeform in lifeforms:
