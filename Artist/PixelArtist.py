@@ -2,6 +2,7 @@ import attr
 from PIL import Image, ImageDraw, ImageOps, ImageFont
 from GridSystem import GridSystem
 from Settings import colors
+from Life import Plant
 
 @attr.s
 class PixelArtist(object):
@@ -12,7 +13,7 @@ class PixelArtist(object):
 
         gridedForms = []
         for lifeform in lifeforms:
-            gridedForms.append(self.grids.arrayToGrid(lifeform, columns))
+            gridedForms.append(self.grids.arrayToGrid(lifeform.dna, columns))
 
         lifeFormWidth = len(gridedForms[0][0])
         lifeFormHeight = len(gridedForms[0])

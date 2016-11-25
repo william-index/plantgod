@@ -1,6 +1,7 @@
 import attr
 from random import randint, shuffle
 from Artist import GridSystem
+from Life import Plant
 
 @attr.s
 class God(object):
@@ -56,7 +57,7 @@ class God(object):
         print "Breeding..."
         nextGen = []
 
-        segments = self.pickRandomDivisor_(len(lifeforms[0]))
+        segments = self.pickRandomDivisor_(len(lifeforms[0].dna))
         print "DNA Splice length: ", segments
 
         segmentedPlants = self.sliceToSegments_(lifeforms, segments)
@@ -69,13 +70,14 @@ class God(object):
                 parent2 = segmentedPlants[randint(0, len(segmentedPlants)-1)]#segmentedPlants[(i+1) % len(segmentedPlants)]
                 breeders = [parent1, parent2]
 
-                newPlant = []
+                newPlantDNA = []
 
                 for j in range(0, len(segmentedPlants[i])):
                     side = randint(0, 1)
-                    newPlant += breeders[side][j]
+                    newPlantDNA += breeders[side][j]
 
-                nextGen.append(newPlant)
+                plant = Plant(newPlantDNA)
+                nextGen.append(plant)
 
         print len(nextGen), " offspring produced."
         return nextGen
@@ -85,8 +87,8 @@ class God(object):
 
         for plant in lifeforms:
             plantSegments = []
-            for i in range(0, len(plant), segments):
-                plantSegments.append(plant[i:i + segments])
+            for i in range(0, len(plant.dna), segments):
+                plantSegments.append(plant.dna[i:i + segments])
             segmentedPlants.append(plantSegments)
 
         return segmentedPlants
@@ -120,7 +122,7 @@ class God(object):
             else:
                 for i in range(0, numMutations):
                     newVal = hex(randint(0, 15) )[2:]
-                    lifeform[randint(0, len(lifeform))-1] = newVal
+                    lifeform.dna[randint(0, len(lifeform.dna))-1] = newVal
 
             mutateLifeforms.append(lifeform)
 
@@ -132,7 +134,7 @@ class God(object):
 
         for lifeform in lifeforms:
             fixedLifeform = []
-            lifeFormGrid = self.grids.arrayToGrid(lifeform, self.lifeFormWidth)
+            lifeFormGrid = self.grids.arrayToGrid(lifeform.dna, self.lifeFormWidth)
 
             # All energy is calculated by checking all cells
             for y in range(0, self.lifeFormHeight):
@@ -144,7 +146,9 @@ class God(object):
             for row in lifeFormGrid:
                 fixedLifeform += row
 
-            trimmedLifeforms.append(fixedLifeform)
+            plant = Plant(fixedLifeform)
+
+            trimmedLifeforms.append(plant)
 
         return trimmedLifeforms
 
@@ -152,12 +156,15 @@ class God(object):
     Calculates the score for a lifeform.
 
     Args:
-        lifeFormArray (Array) : lifeform DNA
+        lifeform (Plant) : Plant lifeform
     Returns:
         int: score for how successful a lifeform is
     """
-    def judgeLifeform(self, lifeFormArray):
-        lifeFormGrid = self.grids.arrayToGrid(lifeFormArray, self.lifeFormWidth)
+    def judgeLifeform(self, lifeform):
+        if lifeform.fitness:
+            return lifeform.fitness
+
+        lifeFormGrid = self.grids.arrayToGrid(lifeform.dna, self.lifeFormWidth)
 
         # Base values of resources needed for any lifeform
         energyNeeded = 100
@@ -187,6 +194,8 @@ class God(object):
         score =  energyOffset**2 + nutrientOffset**2
         # bonus for living cells
         score += self.countRealCells_(lifeFormGrid)
+
+        lifeform.fitness = score
 
         return score
 
@@ -348,13 +357,15 @@ class God(object):
 
 
     def createRandomLifeform(self, size):
-        lifeForm = []
+        lifeFormDNA = []
 
         for i in range(0, size[0]*size[1]):
             # Favors some empty space for starting generation
             if randint(0, 1) > 0:
-                lifeForm.append('0')
+                lifeFormDNA.append('0')
             else:
-                lifeForm.append(hex(randint(0, 15) )[2:])
+                lifeFormDNA.append(hex(randint(0, 15) )[2:])
 
-        return lifeForm
+        plant = Plant(lifeFormDNA)
+
+        return plant

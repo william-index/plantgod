@@ -16,8 +16,8 @@ from Artist import PixelArtist
 
 # Default settings
 generations = 20
-initialPopSize = 20
-survivalSize = 8
+initialPopSize = 50
+survivalSize = 10
 plantWidth = 16
 plantHeight = 32
 rootStart = 0.8
