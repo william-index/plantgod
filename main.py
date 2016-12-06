@@ -14,9 +14,9 @@ from Artist import PixelArtist
 # @TODO: adjust criteria to prevent checkerboards
 
 # Default settings
-generations = 100
+generations = 200
 initialPopSize = 50
-survivalSize = 8
+survivalSize = 16
 plantWidth = 16
 plantHeight = 32
 rootStart = 0.8
