@@ -12,6 +12,7 @@ This project is "done" from the perspective of its core author, whom will press 
 
 ## Running the project
 <img src="http://williamanderson.io/static/images/blog/pixelplants/evolution.gif" />
+
 Plantgod works as a python script. After cloning or pulling the repo, simply run
 ```
 python main.py
